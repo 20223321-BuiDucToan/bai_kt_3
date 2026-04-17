@@ -1,0 +1,96 @@
+PAGES 3
+--- PAGE 1 ---
+-1- 
+ 
+BÀI TẬP CHƯƠNG 4 – TRIỂN KHAI MÔ HÌNH QUẢN LÝ SINH VIÊN 
+MÔ TẢ HỆ THỐNG (Dùng cho tất cả bài tập) 
+Hệ thống Quản lý Sinh viên gồm các thành phần: 
+1. Classroom (Lớp học) 
+• id (PK) 
+• class_name 
+2. Student (Sinh viên) 
+• id (PK) 
+• student_name 
+• class_id (FK → Classroom.id) 
+→ Quan hệ: 1 Classroom – n Students 
+3. Subject (Môn học) 
+• id (PK) 
+• subject_name 
+4. student_subject (Pivot – Đăng ký môn học) 
+• student_id (FK → Student.id) 
+• subject_id (FK → Subject.id) 
+• score (có thể null) 
+• registered_at 
+→ Quan hệ: n–n giữa Student – Subject 
+Bài 1 – Vẽ ERD mô hình Quản lý Sinh viên 
+Yêu cầu: 
+1. Vẽ đúng 3 loại quan hệ: 
+o 1-n: Lớp ↔ Sinh viên 
+o n-n: Sinh viên ↔ Môn học (qua bảng pivot) 
+2. Ghi đúng PK - FK 
+3. Thể hiện attribute đầy đủ 
+Gợi ý đáp án: 
+• Classroom (1) - (n) Student 
+• Student (n) - (n) Subject qua student_subject 
+• student_subject chứa: student_id, subject_id, score, registered_at  
+Bài 2 – Tạo migration & model cho các bảng 
+Yêu cầu: 
+• Viết migration cho Classroom, Student, Subject, student_subject  
+• Khai báo đúng FK, cascade khi xóa. 
+Gợi ý đáp án: 
+• Classroom và Subject: đơn giản 
+
+--- PAGE 2 ---
+-2- 
+ 
+• Student: $table->foreignId('class_id')->constrained()->cascadeOnDelete(); 
+• Bảng pivot: 
+Bài 3 – Khai báo quan hệ Eloquent 
+Yêu cầu: 
+1. Khai báo: 
+o Classroom::hasMany(Student::class) 
+o Student::belongsTo(Classroom::class) 
+2. Khai báo Many-to-Many: 
+o Student::belongsToMany(Subject::class) 
+->withPivot(['score','registered_at']) 
+o Subject::belongsToMany(Student::class) 
+Gợi ý đáp án: 
+Bài 4 – Query Builder & Eloquent nâng cao 
+Thực hiện các truy vấn sau: 
+1. Lấy danh sách sinh viên thuộc lớp “CNTT1” 
+2. Lấy tất cả môn học mà sinh viên có id = 5 đã đăng ký  
+3. Đếm số sinh viên theo từng lớp 
+4. Lấy danh sách sinh viên kèm số lượng môn đăng ký (LEFT JOIN + groupBy) 
+Bài 5 – Local Scope & Global Scope 
+1. Tạo Local Scope: scopeActive($query) 
+a) Lấy sinh viên có trạng thái active 
+b) Áp dụng vào StudentController 
+2. Tạo Global Scope: Tự động sắp xếp sinh viên theo tên tăng dần 
+Bài 6 – Repository Pattern 
+Yêu cầu: 
+1. Tạo interface: StudentRepositoryInterface 
+2. Tạo implement: StudentRepository 
+3. Tạo method: 
+a) all() 
+
+
+--- PAGE 3 ---
+-3- 
+ 
+b) find($id) 
+c) studentsByClass($classId) 
+d) registerSubject($studentId, $subjectId) 
+4. Bind vào AppServiceProvider 
+5. Controller sử dụng repository 
+Bài 7 – Bài tập Tổng hợp (Full Module Student Management) 
+(Dùng khi học xong Chương 4 + REST API) 
+Yêu cầu: 
+1. Tạo API quản lý sinh viên: 
+a) GET /students 
+b) POST /students 
+c) GET /students/{id}/subjects 
+d) POST /students/{id}/register-subject/{subject_id} 
+2. Toàn bộ API bắt buộc dùng Repository Pattern 
+3. Trả về JSON chuẩn REST 
+ 
+

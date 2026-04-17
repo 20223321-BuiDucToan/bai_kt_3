@@ -1,0 +1,28 @@
+erDiagram
+    CLASSROOM ||--o{ STUDENT : has_many
+    STUDENT ||--o{ STUDENT_SUBJECT : registers
+    SUBJECT ||--o{ STUDENT_SUBJECT : belongs_to
+
+    CLASSROOM {
+        bigint id PK
+        string class_name
+    }
+
+    STUDENT {
+        bigint id PK
+        string student_name
+        bigint class_id FK
+        boolean is_active
+    }
+
+    SUBJECT {
+        bigint id PK
+        string subject_name
+    }
+
+    STUDENT_SUBJECT {
+        bigint student_id PK,FK
+        bigint subject_id PK,FK
+        decimal score
+        timestamp registered_at
+    }

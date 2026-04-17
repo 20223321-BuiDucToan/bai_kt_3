@@ -1,0 +1,96 @@
+PAGES 3
+--- PAGE 1 ---
+-1- 
+ 
+BI TP CHNG 4  TRIN KHAI M HNH QUN L SINH VIN 
+M T H THNG (Dng cho tt c bi tp) 
+H thng Qun l Sinh vin gm cc thnh phn: 
+1. Classroom (Lp hc) 
+ id (PK) 
+ class_name 
+2. Student (Sinh vin) 
+ id (PK) 
+ student_name 
+ class_id (FK  Classroom.id) 
+ Quan h: 1 Classroom  n Students 
+3. Subject (Mn hc) 
+ id (PK) 
+ subject_name 
+4. student_subject (Pivot  ng k mn hc) 
+ student_id (FK  Student.id) 
+ subject_id (FK  Subject.id) 
+ score (c th null) 
+ registered_at 
+ Quan h: nn gia Student  Subject 
+Bi 1  V ERD m hnh Qun l Sinh vin 
+Yu cu: 
+1. V ng 3 loi quan h: 
+o 1-n: Lp  Sinh vin 
+o n-n: Sinh vin  Mn hc (qua bng pivot) 
+2. Ghi ng PK - FK 
+3. Th hin attribute y  
+Gi  p n: 
+ Classroom (1) - (n) Student 
+ Student (n) - (n) Subject qua student_subject 
+ student_subject cha: student_id, subject_id, score, registered_at  
+Bi 2  To migration & model cho cc bng 
+Yu cu: 
+ Vit migration cho Classroom, Student, Subject, student_subject  
+ Khai bo ng FK, cascade khi xa. 
+Gi  p n: 
+ Classroom v Subject: n gin 
+
+--- PAGE 2 ---
+-2- 
+ 
+ Student: $table->foreignId('class_id')->constrained()->cascadeOnDelete(); 
+ Bng pivot: 
+Bi 3  Khai bo quan h Eloquent 
+Yu cu: 
+1. Khai bo: 
+o Classroom::hasMany(Student::class) 
+o Student::belongsTo(Classroom::class) 
+2. Khai bo Many-to-Many: 
+o Student::belongsToMany(Subject::class) 
+->withPivot(['score','registered_at']) 
+o Subject::belongsToMany(Student::class) 
+Gi  p n: 
+Bi 4  Query Builder & Eloquent nng cao 
+Thc hin cc truy vn sau: 
+1. Ly danh sch sinh vin thuc lp CNTT1 
+2. Ly tt c mn hc m sinh vin c id = 5  ng k  
+3. m s sinh vin theo tng lp 
+4. Ly danh sch sinh vin km s lng mn ng k (LEFT JOIN + groupBy) 
+Bi 5  Local Scope & Global Scope 
+1. To Local Scope: scopeActive($query) 
+a) Ly sinh vin c trng thi active 
+b) p dng vo StudentController 
+2. To Global Scope: T ng sp xp sinh vin theo tn tng dn 
+Bi 6  Repository Pattern 
+Yu cu: 
+1. To interface: StudentRepositoryInterface 
+2. To implement: StudentRepository 
+3. To method: 
+a) all() 
+
+
+--- PAGE 3 ---
+-3- 
+ 
+b) find($id) 
+c) studentsByClass($classId) 
+d) registerSubject($studentId, $subjectId) 
+4. Bind vo AppServiceProvider 
+5. Controller s dng repository 
+Bi 7  Bi tp Tng hp (Full Module Student Management) 
+(Dng khi hc xong Chng 4 + REST API) 
+Yu cu: 
+1. To API qun l sinh vin: 
+a) GET /students 
+b) POST /students 
+c) GET /students/{id}/subjects 
+d) POST /students/{id}/register-subject/{subject_id} 
+2. Ton b API bt buc dng Repository Pattern 
+3. Tr v JSON chun REST 
+ 
+
